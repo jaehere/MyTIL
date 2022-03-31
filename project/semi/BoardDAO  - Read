@@ -1,0 +1,79 @@
+// *** QnA 글목록보기 메소드를 구현하기 *** //
+	   @Override
+	   public List<QnABoardVO> selectPagingQnaBoard(Map<String, String> paraMap) throws SQLException {
+	
+	      List<QnABoardVO> qnaboardList = new ArrayList<>(); // BoardDTO 속에는 MemberDTO가 들어와야 한다.
+	      QnABoardVO board = null;
+	      try {
+	
+	         conn = ds.getConnection();
+	         /*
+	          * 처음에 한거 String sql =
+	          * " select boardno,  subject, name, to_char(writeday,'yyyy-mm-dd hh24:mi:ss'), viewcount\n"
+	          * + " from jdbc_board B JOIN jdbc_member M\n"+ " ON B.fk_userid = M.userid\n"+
+	          * " order by boardno desc";
+	          */
+	
+	          String sql = " select  pk_qna_num, P.pro_name, P.pro_imgfile_name, qna_title, M.mname, to_char(qna_date,'yyyy-mm-dd hh24:mi:ss'), qna_readcount , fk_userid , qna_issecret\n"+
+	                       " from tbl_member M\n"+
+	                       " JOIN tbl_qna_board Q  \n"+
+	                       " ON M.pk_userid = Q.fk_userid\n"+
+	                       " JOIN tbl_product P \n"+
+	                       " ON Q.fk_pnum = P.pk_pro_num\n"+
+	                       " where isdelete = 0\n"+
+	                       " order by pk_qna_num desc";
+	
+	         
+          // BoardDTO는 회원이 존재해야만 그 회원이 글을 쓴다. 회원이 없는데 어뜨캐 글을 쓰냐 회원테이블이 먼저 존재한다.
+            pstmt = conn.prepareStatement(sql);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+   /*
+               board = new QnABoardVO();
+               
+               board.setPk_qna_num(rs.getInt(1));
+               
+               qnaboardList.add(board);
+               
+               System.out.println(" 넣어진 것 : " + board.getPk_qna_num());
+   */            
+               
+               board = new QnABoardVO();
+               
+               board.setPk_qna_num(rs.getInt(1));
+               
+               ProductVO product = new ProductVO(); 
+               product.setPro_name(rs.getString(2));
+               product.setPro_imgfile_name(rs.getString(3)); 
+               board.setProduct(product);
+               
+               board.setQna_title(rs.getString(4)); 
+               
+               
+               // **중요한 부분 
+               MemberVO member = new MemberVO();
+               member.setName(rs.getString("mname")); 
+               board.setMember(member); // 보드에 멤버를 넣어줌.
+               
+               board.setQna_date(rs.getString(6)); 
+               board.setQna_readcount(rs.getInt(7));
+               board.setFk_userid(rs.getString(8));
+               board.setQna_issecret(rs.getInt(9));
+               
+               qnaboardList.add(board);
+               
+               System.out.println(" 넣어진 제목 : " + board.getQna_title());
+               System.out.println(" 넣어진 제목 : " + product.getPro_name());
+            } // end of while(rs.next()) ------------
+
+         
+         } catch (SQLException e) {
+            e.printStackTrace();
+         } finally {
+            close();
+         }
+
+         return qnaboardList;
+      }// end of public List<BoardDTO> boardList() -----
