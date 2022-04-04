@@ -1,0 +1,25 @@
+자바스크립트에서 페이지 이동은 lcoation.href 를 쓴다. url의 이동이 일어난다.
+location.href="<%= ctxPath%>/member/memberOneDetail.up?userid="+userid+"&goBackURL=${requestScope.goBackURL}";
+														                "&goBackURL=/member/memberList.up?currentShowPageNo=6 sizePerPage=10 searchType=name searchWord=%EC%9C%A0
+
+function goMemberList(){
+		
+		let goBackURL = "${requestScope.goBackURL}"
+	//	alert("확인용 : "+ goBackURL);
+		// 확인용 currentURL => /member/memberList.up?currentShowPageNo=3 sizePerPage=10 searchType=name searchWord=유
+				//공백 대신 다시 &로 바꿔서 값을 넣어준다.
+				
+		// 자바스크립트에서는  replaceall 이 없고 replace 밖에 없다.
+      	// !!! 자바스크립트에서 replace를 replaceall 처럼 사용하기 !!! //
+      
+      	// "korea kena" ==> "korea kena".replace("k","y") ==> "yorea kena"
+        // "korea kena".replace(/k/gi, "y") ==> "yorea yena"  여기서 주의할 것은 /"k"/ 아니라 /k/ 와 같이 "" 가 없어야 한다.		
+	
+        // 변수 goBackURL 에 공백 " "을 모두 "&" 로 변경하도록 한다.
+        goBackURL = goBackURL.replace(/ /gi, "&");
+    //    alert("최종확인용 :" + goBackURL);
+        
+		location.href="/MyMVC"+goBackURL ;
+		// url을 기억했다가 회원목록[검색된결과]를 클릭하면 아까 기억했던 url로 돌아간다. 
+	}
+	
