@@ -94,8 +94,9 @@ C:\Users\sist\.m2\repository<br/>
 sql만 쓰면 된다. !!<br/>
 
 sql문이 어디에 있다고 알려주는 거
+```
 <property name="mapperLocations" value="classpath*:com/spring/board/mapper/*.xml" />
-
+```
 <br/><br/>
 
 <hr/>
