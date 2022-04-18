@@ -93,10 +93,10 @@ C:\Users\sist\.m2\repository<br/>
 - MyMVC 의 DAO같은게 이제 필요없다.<br/>
 sql만 쓰면 된다. !!<br/>
 
-sql문이 어디에 있다고 알려주는 거:<br/>
- <b><property name="mapperLocations" value="classpath*:com/spring/board/mapper/*.xml" /></b>
+sql문이 어디에 있다고 알려주는 거
+<property name="mapperLocations" value="classpath*:com/spring/board/mapper/*.xml" />
 
-
+<br/><br/>
 
 <hr/>
 <h2> [오후]</h2>
