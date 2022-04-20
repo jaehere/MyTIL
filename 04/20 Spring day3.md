@@ -33,8 +33,19 @@ Spring에서는 Tiles를 사용한다.
 맵퍼에서 읽어온 컬럼값이 MemberVO로 찾아가서  쑥 들어간다.
 MyMVC 처럼 memeber.set 작업을 할 필요가 없다.
 
+<br><br>
+<h2>AES256 암호화 복호화 설정해두기</h2>
+	
+![image](https://user-images.githubusercontent.com/57201495/164265085-7f6aa285-ac03-4563-aa99-4a9de4010379.png)
+AES256 클래스와 같이 파라미터가 있는 생성자는 기본생성자를 없앤다.
+@Component 쓰려면 그 클래스에 기본생성자가 존재해야 함.
+@Component 써봤자 bean으로 안올라간다 => xml에서 해줘야 함.
 
-<h2>로그인처리</h2>
+스프링에서는 매번 new new 안해주고, 
+bean으로 메모리에 올라가 있는 걸 불러서 사용한다.
+
+<br><br>
+<h2>Sevice, DAO 선언 등 초기설정</h2>
 
 #29 .xml mapper 기본설정 / 루트 엘리먼트 & 네임스페이스 설정 ( 프로젝트 전체 내에서 유일해야 한다.) 일반적으로 파일명 사용
 <mapper namespace="board">
@@ -87,4 +98,118 @@ private InterBoardDAO dao; // null이 되지 않게 어노테이션
 ```
 Type 에 따라 Spring 컨테이너가 알아서 bean 으로 등록된 com.spring.board.BoardDAO 의 bean 을  dao 에 주입시켜준다. 
 그러므로 dao 는 null 이 아니다
+
+#35. 의존객체 주입하기(DI: Dependency Injection) 
+- IoC(Inversion of Control == 제어의 역전)<br>
+	     개발자가 인스턴스 변수 객체를 필요에 의해 생성해주던 것에서 탈피하여 <u>스프링은 컨테이너에 객체를 담아 두고</u>, <br>
+	     필요할 때에 컨테이너로부터 객체를 가져와 사용할 수 있도록 하고 있다. <br>
+	     스프링은 객체의 생성 및 생명주기를 관리할 수 있는 기능을 제공하고 있으므로, <br>더이상 개발자에 의해 객체를 생성 및 소멸하도록 하지 않고<br>
+	     객체 생성 및 관리를 스프링 프레임워크가 가지고 있는 객체 관리기능을 사용하므로<br> Inversion of Control == 제어의 역전 이라고 부른다.  <br>
+	     그래서 스프링 컨테이너를 IOC(Inversion of Control) 컨테이너라고도 부른다.
+- 느슨한 결합
+스프링 컨테이너가 BoardController 클래스 객체에서 BoardService 클래스 객체를 사용할 수 있도록 <br>
+만들어주는 것을 "느슨한 결합" 이라고 부른다.<br>
+느스한 결합은 BoardController 객체가 메모리에서 삭제되더라도 <br>BoardService service 객체는 메모리에서 동시에 삭제되는 것이 아니라 남아 있다.
+	   
+- 단단한 결합(개발자가 인스턴스 변수 객체를 필요에 의해서 생성해주던 것)
+private InterBoardService service = new BoardService(); <br>
+BoardController 객체가 메모리에서 삭제 되어지면  BoardService service 객체는 멤버변수(필드)이므로 메모리에서 자동적으로 삭제되어진다.
+<br><br>	
+<h2>게시판 시작</h2>	
+#36 메인 페이지 요청<br>
+*BoardController<br>
+service.getImgfilenameList();<br>
+
+/WEB-INF/views/tiles1/main/index.jsp 파일을 생성한다.<br>
+
+#37 시작페이지에서 메인 이미지를 보여주는 것<br>
+*BoardService<br>
+dao.getImgfilenameList();<br>
+	
+#38 시작페이지에서 메인 이미지를 보여주는 것 <br>
+*BoardDAO<br>
+List<String> imgfilenameList = sqlsession.selectList("board.getImgfilenameList");<br>
+	
+#39 시작페이지에서 메인 이미지를 보여주는 것<br>
+	```
+	<select id="getImgfilenameList" resultType="String"><br>
+		select문 <br>
+	</select><br>
+	```
+<br>
+#40 로그인 폼 페이지 요청<br>
+@RequestMapping(value="/login.action", method= {RequestMethod.GET})	//form 태그가 떠야하니깐 method는 오로지 get<br>
+	
+#41 로그인 처리하기<br>
+```
+@RequestMapping(value="/loginEnd.action", method= {RequestMethod.POST})
+public ModelAndView loginEnd(ModelAndView mav, HttpServletRequest request) {
+	...
+	MemberVO loginuser = service.getLoginMember(paraMap);
+	if(loginuser == null) { //로그인 실패시
+		...
+	}
+	else { // 아이디와 암호가 존재하는 경우
+		...
+		}
+		else { //로그인 한지 1년 이내인 경우
+			...
+			}
+			else { // 암호를 마지막으로 변경한 것이 3개월 이내인 경우
+				...
+			}
+		}
+	}
+	return mav;
+}
+```	
+	
+#42 로그인 처리하기<br>
+dao.getLoginMember(paraMap);
+	
+#43 양방향 암호화 알고리즘인 AES256 암호화를 지원하는 클래스 생성하기 <br>
+(기본생성자가 없으므로 @Componet 를 쓰면 오류가 발생한다.<br>
+그래서 servlet-context.xml 파일에 직접 파라미터가 있는 생성자로 bean 등록을 해주어야 한다.)<br>
+
+#44 양방향 암호화 알고리즘인 AES256 를 사용하여 복호화 하기 위한 클래스(파라미터가 있는 생성자) 의존객체 bean 생성하기 
+```
+<beans:bean id="aes" class="com.spring.board.common.AES256">
+   <beans:constructor-arg>
+      <beans:value>abcd0070#cclass$</beans:value> <!-- abcd0070#cclass$ 은 각자 com.spring.board.common.SecretMyKey 에 사용되던 암호화/복호화 키 이다. -->   
+   </beans:constructor-arg>
+</beans:bean>
+```
+	
+#45 양방향 암호화 알고리즘인 AES256 를 사용하여 복호화 하기 위한 클래스 의존객체 주입하기(DI: Dependency Injection)<br>
+@Autowired
+private AES256 aes;
+	<br>
+Type 에 따라 Spring 컨테이너가 알아서 bean 으로 등록된 com.spring.board.common.AES256 의 bean 을  aes 에 주입시켜준다. <br>
+그러므로 aes 는 null 이 아니다.<br>
+com.spring.board.common.AES256 의 bean 은 /webapp/WEB-INF/spring/appServlet/servlet-context.xml 파일에서 bean 으로 등록시켜주었음.  <br>
+
+#46 로그인 처리하기<br>
+MemberVO loginuser = sqlsession.selectOne("board.getLoginMember", paraMap);<br>
+	
+#47 board.xml 로그인 처리하기<br>
+- HashMap 타입으로 매개변수를 받아온 것을 꺼내서 사용할때 <br>
+1. 데이터로 사용할때는 #{key명} 이고,<br>
+2. 식별자(테이블명, 컬럼명)로 사용할때는 ${key명} 이고,<br>
+3. myBatis 에서 제공하는 if 엘리먼트나 choose 엘리먼트 안에서 사용할때는 <br>
+  그냥 <if test="key명"> <when test="key명"> 으로 사용한다. <br>
+```
+<select id="getLoginMember" resultType="com.spring.board.model.MemberVO" parameterType="HashMap">
+	select문
+</select>
+<update id="updateIdle" parameterType="String">
+	update tbl_member set idle = 1
+	where userid = #{userid}
+</update>
+```
+	
+#48 aes 의존객체를 사용하여 로그인 되어진 사용자(loginuser)의 이메일 값을 복호화 하도록 한다. <br>
+  또한 암호변경 메시지와 휴면처리 유무 메시지를 띄우도록 업무처리를 하도록 한다.<br>
+	
+#49 로그인이 성공되어지면 로그인되어진 사용자의 이메일 주소를 출력하기 <br>
+	<c:if></c:if> 사용함.
 
