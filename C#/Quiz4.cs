@@ -41,14 +41,14 @@ namespace Quiz4
             {
                 salary = s;
             }
-            public override int CalculatePay() // abstract method 반드시 재정의 해야함.
+            public override int CalculatePay() 
             {
                 return salary;
             }
         }
         class HourlyEmp : Employee
         {
-            private int salary;
+            
             private int payPerHour;
             private int hours;
 
@@ -57,27 +57,23 @@ namespace Quiz4
                 payPerHour = ph;
                 hours = h;
             }
-            public override int CalculatePay() // abstract method 반드시 재정의 해야함.
+            public override int CalculatePay() 
             {
-                return salary = payPerHour * hours;
+                return payPerHour * hours;
             }
-            //public override void Draw()
-            //{
-            //    base.Draw();
-            //    Console.WriteLine($"width={width} height={height}");
-            //}
+            
         }
         static void Main(string[] args)
         {
             const int size = 2;
-            Employee[] em = new Employee[size]; // <=======
-            em[0] = new SalariedEmp(1, "박찬호", 1000000);  //upcasting
-            em[1] = new HourlyEmp(2, "홍길동", 40, 5000);  //upcasting
+            Employee[] em = new Employee[size]; 
+            em[0] = new SalariedEmp(1, "박찬호", 1000000); 
+            em[1] = new HourlyEmp(2, "홍길동", 40, 5000); 
             foreach (Employee e in em)
             {
                 e.Print();
                 Console.WriteLine();
-                
+              
             }
         }
     }
