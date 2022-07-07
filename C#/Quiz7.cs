@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Day3과제7입니다
 {
-    class Program
+    class Quiz7
     {
         abstract class Employee
         {
